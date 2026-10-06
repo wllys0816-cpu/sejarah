@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Timeline 1945–1949 — Arsip Nusantara</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=Playfair+Display:wght@900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="koran">
+  <div class="atas"><span>Edisi khusus, lembar arsip</span><span>Jakarta</span><span>Dibaca ulang dari zaman ke zaman</span></div>
+  <div class="nama"><a href="index.html">Arsip Nusantara</a></div>
+  <div class="garis">
+    <span>Linimasa Revolusi Nasional</span>
+    <nav aria-label="Navigasi"><a href="index.html">Beranda</a><a href="bab.html">Daftar Bab</a><a href="tentang.html">Tentang</a></nav>
+  </div>
+  <main>
+    <p class="label"><a href="index.html">Beranda</a> / Timeline</p>
+    <h1 class="judul-halaman">Linimasa 1945–1949</h1>
+    <p>Dari Proklamasi hingga penyerahan kedaulatan hasil Konferensi Meja Bundar. <span id="hitung"></span></p>
+    <div class="filter-bar" id="filter">
+      <button data-f="Semua" class="aktif">Semua</button>
+      <button data-f="Politik">Politik</button>
+      <button data-f="Diplomasi">Diplomasi</button>
+      <button data-f="Pertempuran">Pertempuran</button>
+    </div>
+    <ol class="daftar-titik" id="daftar"></ol>
+    <div class="nav-bawah">
+      <a href="bab.html">← Daftar Bab</a>
+      <a href="index.html">Beranda →</a>
+    </div>
+  </main>
+  <p class="kaki">Arsip Nusantara. Sejarah Indonesia dalam lembaran koran.</p>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+(function () {
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  var daftar = document.getElementById('daftar');
+  var hitung = document.getElementById('hitung');
+  function gambar(f) {
+    var list = f === 'Semua'
+      ? SEJARAH.timeline
+      : SEJARAH.timeline.filter(function (t) { return t.kategori === f; });
+    hitung.textContent = '(' + list.length + ' peristiwa)';
+    var html = '';
+    list.forEach(function (t) {
+      html += '<li><p><strong>' + esc(t.tahun) + '</strong> [' + esc(t.kategori) + ']</p>'
+        + '<p><strong>' + esc(t.judul) + '</strong></p>'
+        + '<p>' + esc(t.ringkasan) + '</p>'
+        + '<p><a href="bab.html?slug=' + t.babSlug + '">Baca selengkapnya →</a></p></li>';
+    });
+    daftar.innerHTML = html;
+  }
+  document.getElementById('filter').addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (!b) return;
+    var btns = this.querySelectorAll('button');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('aktif');
+    b.classList.add('aktif');
+    gambar(b.getAttribute('data-f'));
+  });
+  gambar('Semua');
+})();
+</script>
+</body>
+</html>

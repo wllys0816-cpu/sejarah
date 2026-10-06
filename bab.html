@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Daftar Bab — Arsip Nusantara 1945–1949</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=Playfair+Display:wght@900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="koran">
+  <div class="atas"><span>Edisi khusus, lembar arsip</span><span>Jakarta</span><span>Dibaca ulang dari zaman ke zaman</span></div>
+  <div class="nama"><a href="index.html">Arsip Nusantara</a></div>
+  <div class="garis">
+    <span>Revolusi Nasional 1945–1949</span>
+    <nav aria-label="Navigasi"><a href="index.html">Beranda</a><a href="timeline.html">Timeline</a><a href="tentang.html">Tentang</a></nav>
+  </div>
+  <main id="isi">
+    <p class="label"><a href="index.html">Beranda</a> / <span id="remah">Daftar Bab</span></p>
+    <div id="konten">Memuat arsip...</div>
+    <div class="nav-bawah">
+      <a href="index.html">← Beranda</a>
+      <a href="timeline.html">Timeline 1945–1949 →</a>
+    </div>
+  </main>
+  <p class="kaki">Arsip Nusantara. Sumber: Buku Sejarah SMA Kemendikbud • Arsip Nasional RI.</p>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+(function () {
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  var slug = param('slug');
+  var box = document.getElementById('konten');
+  var remah = document.getElementById('remah');
+  if (!slug) {
+    var dibaca = ambilBaca();
+    var html = '<p class="label">EDISI REVOLUSI NASIONAL • 1945–1949</p>'
+      + '<h1 class="judul-halaman">Perjalanan Menuju Pengakuan Kedaulatan</h1>'
+      + '<p>Dari teks proklamasi 17 Agustus 1945 hingga penyerahan kedaulatan 27 Desember 1949. Baca berurutan Bab 1–5 agar alur sebab-akibatnya jelas.</p>'
+      + '<table class="tabel-isi"><thead><tr><th>No</th><th>Judul Bab</th><th>Periode</th><th>Status</th></tr></thead><tbody>';
+    SEJARAH.babs.forEach(function (b) {
+      html += '<tr><td>' + b.id + '</td>'
+        + '<td><a href="bab.html?slug=' + b.slug + '"><strong>' + esc(b.judul) + '</strong></a><br><small>' + esc(b.ringkasan) + '</small></td>'
+        + '<td>' + esc(b.periode) + '</td>'
+        + '<td>' + (dibaca.indexOf(b.slug) !== -1 ? '✓ Sudah' : 'Belum') + '</td></tr>';
+    });
+    html += '</tbody></table>';
+    box.innerHTML = html;
+    return;
+  }
+  var found = cariBab(slug);
+  if (!found.bab) {
+    remah.textContent = 'Tidak ditemukan';
+    box.innerHTML = '<h1 class="judul-halaman">Arsip Tidak Ditemukan</h1>'
+      + '<p>Nomor arsip "' + esc(slug) + '" tidak ada dalam daftar 1945–1949.</p>'
+      + '<p><a class="tombol" href="bab.html">← Kembali ke Daftar Isi</a></p>';
+    return;
+  }
+  var bab = found.bab, idx = found.idx;
+  tandaiBaca(bab.slug);
+  remah.textContent = bab.nomor + ' / ' + bab.judul;
+  var html = '<p class="label">' + esc(bab.nomor) + ' | ' + esc(bab.periode) + ' | ' + esc(bab.estimasi) + '</p>'
+    + '<h1 class="judul-halaman">' + esc(bab.judul) + '</h1>'
+    + '<p><em>' + esc(bab.ringkasan) + '</em></p>'
+    + '<figure style="margin:0"><div class="foto-garis">[ Foto arsip ]</div>'
+    + '<figcaption>' + esc(bab.gambarCaption) + '</figcaption></figure>';
+  bab.isi.forEach(function (bagian) {
+    html += '<h2>' + esc(bagian.subjudul) + '</h2>';
+    bagian.paragraf.forEach(function (p) { html += '<p>' + esc(p) + '</p>'; });
+  });
+  html += '<h3>' + esc(bab.dokumenArsip.judul) + '</h3>'
+    + '<blockquote>' + esc(bab.dokumenArsip.isi) + '</blockquote>'
+    + '<h3>Tokoh Kunci</h3><p>' + esc(bab.tokoh.join(' • ')) + '</p>'
+    + '<h3>Istilah Penting</h3><p>' + esc(bab.istilah.join(' • ')) + '</p>';
+  var terkait = SEJARAH.timeline.filter(function (t) { return t.babSlug === bab.slug; });
+  if (terkait.length) {
+    html += '<h3>Titik waktu bab ini di Timeline</h3><ul>';
+    terkait.forEach(function (t) { html += '<li><strong>' + esc(t.tahun) + '</strong> — ' + esc(t.judul) + '</li>'; });
+    html += '</ul>';
+  }
+  var prev = SEJARAH.babs[idx - 1], next = SEJARAH.babs[idx + 1];
+  html += '<div class="nav-bawah"><span>'
+    + (prev ? '<a href="bab.html?slug=' + prev.slug + '">← ' + esc(prev.nomor) + '</a>' : '← Awal')
+    + '</span><a href="bab.html">Daftar Isi</a><span>'
+    + (next ? '<a href="bab.html?slug=' + next.slug + '">' + esc(next.nomor) + ' →</a>' : 'Akhir →')
+    + '</span></div>'
+    + '<p style="text-align:center"><a class="tombol" href="timeline.html">Lihat di Timeline →</a></p>';
+  box.innerHTML = html;
+})();
+</script>
+</body>
+</html>
